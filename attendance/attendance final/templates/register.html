@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Employee Face Registration</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #000;
+      font-family: "Segoe UI", Roboto, sans-serif;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 40px 0;
+      overflow-y: auto;
+    }
+
+    .card {
+      background: linear-gradient(145deg, #111, #1a1a1a);
+      border: none;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+      width: 100%;
+      max-width: 520px;
+      animation: fadeIn 0.8s ease-out;
+      margin: auto;
+    }
+
+    h2 {
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    label {
+      margin-top: 15px;
+      color: #ccc;
+      font-weight: 500;
+    }
+
+    .form-control {
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 12px;
+      color: #fff;
+      padding: 12px;
+    }
+
+    .helper-text {
+      font-size: 14px;
+      margin-top: 5px;
+      transition: 0.3s;
+    }
+
+    .valid {
+      color: #0f0;
+    }
+
+    .invalid {
+      color: #f33;
+    }
+
+    .btn-register,
+    .btn-exit {
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      transition: transform 0.2s;
+    }
+
+    .btn-register {
+      background: #0071e3;
+      margin-top: 15px;
+    }
+
+    .btn-register:hover:enabled {
+      transform: scale(1.05);
+      background: #0a84ff;
+    }
+
+    .btn-register:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .btn-exit {
+      background: #e63946;
+      margin-top: 15px;
+    }
+
+    .btn-exit:hover {
+      transform: scale(1.05);
+      background: #ff4d5a;
+    }
+
+    .popup-message {
+      position: fixed;
+      bottom: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111;
+      color: #fff;
+      padding: 14px 24px;
+      border-radius: 50px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      font-size: 16px;
+      transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+      opacity: 0;
+      z-index: 2000;
+    }
+
+    .popup-message.show {
+      bottom: 40px;
+      opacity: 1;
+    }
+
+    #overlayExit {
+      position: fixed;
+      top: 100%;
+      left: 0;
+      width: 0;
+      height: 0;
+      background: radial-gradient(circle at center, #e63946, #8b0000);
+      border-radius: 50%;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: all 0.7s ease-in-out;
+      opacity: 0.85;
+    }
+
+    #overlayExit.active {
+      width: 4000px;
+      height: 4000px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h2>📸 Employee Face Registration</h2>
+
+    <!-- IMPORTANT: DO NOT ADD action="", fetch() handles submission -->
+    <form id="registerForm">
+      <label>Employee ID</label>
+      <input type="text" class="form-control" name="emp_id" id="emp_id" required>
+      <div id="idHelper" class="helper-text">Format: CS001</div>
+
+      <label>Employee Name</label>
+      <input type="text" class="form-control" name="emp_name" id="emp_name" required>
+      <div id="nameHelper" class="helper-text">Only letters and spaces allowed</div>
+
+      <label>Password</label>
+      <input type="password" class="form-control" name="password" id="password" required>
+      <div id="pwHelper" class="helper-text">Min 6 characters</div>
+
+      <label>Confirm Password</label>
+      <input type="password" class="form-control" name="confirm" id="confirm" required>
+      <div id="confirmHelper" class="helper-text">Must match above</div>
+
+      <label>Contact Number</label>
+      <input type="text" class="form-control" name="contact" id="contact" required>
+      <div id="contactHelper" class="helper-text">10-digit mobile number</div>
+
+      <button type="submit" class="btn-register" id="registerBtn">👤 Register</button>
+    </form>
+
+    <button id="exitBtn" class="btn-exit">❌ Exit</button>
+  </div>
+
+  <div id="popup" class="popup-message"></div>
+  <div id="overlayExit"></div>
+
+  <script>
+    const popup = document.getElementById("popup");
+    function showPopup(msg) {
+      popup.innerHTML = msg;
+      popup.classList.add("show");
+      setTimeout(() => popup.classList.remove("show"), 4000);
+    }
+
+    // Live validation
+    const empId = document.getElementById("emp_id"),
+      idHelper = document.getElementById("idHelper");
+
+    empId.oninput = () => {
+      /^CS\d{3}$/.test(empId.value)
+        ? (idHelper.textContent = "✅ Correct format", idHelper.className = "helper-text valid")
+        : (idHelper.textContent = "❌ Invalid format", idHelper.className = "helper-text invalid");
+    };
+
+    const empName = document.getElementById("emp_name"),
+      nameHelper = document.getElementById("nameHelper");
+
+    empName.oninput = () => {
+      /^[A-Za-z ]+$/.test(empName.value)
+        ? (nameHelper.textContent = "✅ Valid name", nameHelper.className = "helper-text valid")
+        : (nameHelper.textContent = "❌ Only letters/spaces allowed", nameHelper.className = "helper-text invalid");
+    };
+
+    const pw = document.getElementById("password"),
+      confirm = document.getElementById("confirm"),
+      pwHelper = document.getElementById("pwHelper"),
+      confirmHelper = document.getElementById("confirmHelper");
+
+    pw.oninput = () => {
+      pw.value.length >= 6
+        ? (pwHelper.textContent = "✅ Strong enough", pwHelper.className = "helper-text valid")
+        : (pwHelper.textContent = "❌ Too short", pwHelper.className = "helper-text invalid");
+    };
+
+    confirm.oninput = () => {
+      confirm.value === pw.value
+        ? (confirmHelper.textContent = "✅ Passwords match", confirmHelper.className = "helper-text valid")
+        : (confirmHelper.textContent = "❌ Passwords don’t match", confirmHelper.className = "helper-text invalid");
+    };
+
+    const contact = document.getElementById("contact"),
+      contactHelper = document.getElementById("contactHelper");
+
+    contact.oninput = () => {
+      /^[6-9]\d{9}$/.test(contact.value)
+        ? (contactHelper.textContent = "✅ Valid number", contactHelper.className = "helper-text valid")
+        : (contactHelper.textContent = "❌ Invalid number", contactHelper.className = "helper-text invalid");
+    };
+
+    // Submit handler
+    const registerBtn = document.getElementById("registerBtn");
+
+    document.getElementById("registerForm").addEventListener("submit", async e => {
+      e.preventDefault();
+
+      registerBtn.disabled = true;
+      const original = registerBtn.textContent;
+      registerBtn.textContent = "📷 Capturing face… Please wait";
+
+      try {
+        const data = new FormData(e.target);
+        const res = await fetch("/", { method: "POST", body: data });
+        const json = await res.json();
+
+        if (json.duplicate) {
+          showPopup("🚫 " + json.error);
+        } else if (json.error) {
+          showPopup("⚠️ " + json.error);
+        } else if (json.redirect) {
+          window.location.href = json.redirect;
+        }
+      } catch (err) {
+        showPopup("⚠️ Server error. Try again.");
+      }
+
+      registerBtn.disabled = false;
+      registerBtn.textContent = original;
+    });
+
+    // Exit animation
+    const overlayExit = document.getElementById("overlayExit");
+    document.getElementById("exitBtn").onclick = () => {
+      overlayExit.classList.add("active");
+      setTimeout(() => (window.location = "/login"), 600);
+    };
+  </script>
+</body>
+
+</html>
